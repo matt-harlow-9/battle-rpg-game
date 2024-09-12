@@ -40,12 +40,16 @@ class Fighter():
         self.alive = True
         self.animation_list = []
         self.frame_index = 0
+        self.action = 0 # 0: idle, 1: attack, 2: hurt, 3: death
         self.update_time = pygame.time.get_ticks()
+        # load images
+        temp_list = []
         for i in range(8):
             img = pygame.image.load(f'img/{self.name}/idle/{i}.png')
             img = pygame.transform.scale(img, (img.get_width() * 3, img.get_height() * 3))
-            self.animation_list.append(img)
-        self.image = self.animation_list[self.frame_index]
+            temp_list.append(img)
+        self.animation_list.append(temp_list)
+        self.image = self.animation_list[self.action][self.frame_index]
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
 
@@ -56,13 +60,13 @@ class Fighter():
         animation_cooldown = 100
         # handle animation
         # update image
-        self.image = self.animation_list[self.frame_index]
+        self.image = self.animation_list[self.action][self.frame_index]
         # check if enough time has passed since last update
         if pygame.time.get_ticks() - self.update_time > animation_cooldown:
             self.update_time = pygame.time.get_ticks()
             self.frame_index += 1
         # if animation runs out, reset back to start
-        if self.frame_index >= len(self.animation_list):
+        if self.frame_index >= len(self.animation_list[self.action]):
             self.frame_index = 0
 
 knight = Fighter(200, 260, 'Knight', 30, 10, 3)
