@@ -37,14 +37,33 @@ class Fighter():
         self.strength = strength
         self.start_potions = potions
         self.potions = potions
-        self.alive = True 
-        img = pygame.image.load(f'img/{self.name}/idle/0.png')
-        self.image = pygame.transform.scale(img, (img.get_width() * 3, img.get_height() * 3))
+        self.alive = True
+        self.animation_list = []
+        self.frame_index = 0
+        self.update_time = pygame.time.get_ticks()
+        for i in range(8):
+            img = pygame.image.load(f'img/{self.name}/idle/{i}.png')
+            img = pygame.transform.scale(img, (img.get_width() * 3, img.get_height() * 3))
+            self.animation_list.append(img)
+        self.image = self.animation_list[self.frame_index]
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
 
     def draw(self):
         screen.blit(self.image, self.rect)
+
+    def update(self):
+        animation_cooldown = 100
+        # handle animation
+        # update image
+        self.image = self.animation_list[self.frame_index]
+        # check if enough time has passed since last update
+        if pygame.time.get_ticks() - self.update_time > animation_cooldown:
+            self.update_time = pygame.time.get_ticks()
+            self.frame_index += 1
+        # if animation runs out, reset back to start
+        if self.frame_index >= len(self.animation_list):
+            self.frame_index = 0
 
 knight = Fighter(200, 260, 'Knight', 30, 10, 3)
 bandit1 = Fighter(550, 270, 'Bandit', 20, 6, 1)
@@ -65,8 +84,10 @@ while run:
     draw_panel()
 
     # draw fighters
+    knight.update()
     knight.draw()
     for bandit in bandit_list:
+        bandit.update()
         bandit.draw()
 
     for event in pygame.event.get():
