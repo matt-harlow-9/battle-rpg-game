@@ -127,6 +127,8 @@ class Fighter():
         if target.hp < 1:
             target.hp = 0
             target.alive = False
+        damage_text = DamageText(target.rect.centerx, target.rect.y, str(damage), red)
+        damage_text_group.add(damage_text)
         # set variables to attack animation
         self.action = 1
         self.frame_index = 0
@@ -148,6 +150,14 @@ class HealthBar():
         # actual hp
         pygame.draw.rect(screen, green, (self.x, self.y, ratio * 150, 20))
 
+class DamageText(pygame.sprite.Sprite):
+    def __init__(self, x, y, damage, color):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = font.render(damage, True, color)
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+
+damage_text_group = pygame.sprite.Group()
 
 knight = Fighter(200, 260, 'Knight', 30, 10, 3)
 bandit1 = Fighter(550, 270, 'Bandit', 20, 6, 1)
@@ -183,6 +193,10 @@ while run:
     for bandit in bandit_list:
         bandit.update()
         bandit.draw()
+
+    # draw damage text
+    damage_text_group.update()
+    damage_text_group.draw(screen)
 
     # control player actions
 
@@ -249,9 +263,10 @@ while run:
                         current_fighter += 1
                         action_cooldown = 0
                     # attack
-                    bandit.attack(knight)
-                    current_fighter += 1
-                    action_cooldown = 0
+                    else:
+                        bandit.attack(knight)
+                        current_fighter += 1
+                        action_cooldown = 0
             else:
                 current_fighter += 1
 
